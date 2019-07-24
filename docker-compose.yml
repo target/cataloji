@@ -1,0 +1,37 @@
+version: '3'
+services:
+
+  influxdb:
+    image: influxdb
+    environment:
+      - INFLUXDB_DB=metrics
+    ports:
+      - 8086:8086
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+
+  cataloji:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: target/cataloji:local
+    ports:
+      - 5000:5000
+    cap_add:
+      - ALL
+    environment:
+      - INFLUXDB_URI=influxdb://influxdb:8086/metrics
+      - RUNTIME_LOG_LEVEL=debug
+      - LOG_LEVEL=DEBUG
+      - EXTRA_TAGS={"app":"cataloji"}
+      - SLACK_SIGNING_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      - VERIFICATION_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxx
